@@ -1,0 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@500;700;900&display=swap");
+
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
+
+* {
+    font-family: "Roboto", sans-serif;
+}
+
+.coverShadow:hover > .videoTitle {
+    margin-top: 0px;
+}
+.coverShadow:hover > .videoControls {
+    margin-bottom: 0px;
+}
