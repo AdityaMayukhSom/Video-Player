@@ -7,14 +7,13 @@ const MediaPlayer = () => {
     const opacityNull = { opacity: 0, pointerEvents: "none", cursor: "none" };
     const opacityFull = { opacity: 1, pointerEvents: "all", cursor: "auto" };
     let videoArray = [
-        { videoName: "Baraat", videoURL: "./videos/Baraat.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
-        { videoName: "O Je Mane Na Mana", videoURL: "./videos/ManeNaMana.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
-        { videoName: "Pasoori", videoURL: "./videos/Pasoori.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
-        { videoName: "Komola", videoURL: "./videos/Komola.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
-        { videoName: "Thor Ragnarok", videoURL: "./videos/Ragnarok.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
-        { videoName: "Thor Love And Thunder", videoURL: "./videos/Thor.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
-        { videoName: "Ms. Marvel", videoURL: "./videos/Marvel.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
-        { videoName: "Moon Knight", videoURL: "./videos/Moon.mp4", subtitleURL: "./subtitle/mySubtitle.vtt" },
+        { videoName: "Pasoori", videoURL: "./videos/Pasoori.mp4", subtitleURL: "./subtitle/Pasoori.vtt", posterURL: "./images/Pasoori.jpg" },
+        { videoName: "Baraat", videoURL: "./videos/Baraat.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Baraat.jpeg" },
+        { videoName: "O Je Mane Na Mana", videoURL: "./videos/ManeNaMana.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
+        { videoName: "Komola", videoURL: "./videos/Komola.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
+        { videoName: "Thor Love And Thunder", videoURL: "./videos/Thor.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
+        { videoName: "Ms. Marvel", videoURL: "./videos/Marvel.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
+        { videoName: "Moon Knight", videoURL: "./videos/Moon.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
     ];
     const [isPlaying, setIsPlaying] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -362,7 +361,25 @@ const MediaPlayer = () => {
                 setCoverOpacity(opacityFull);
             }
         };
+
+        getSubtitle();
     });
+
+    // const [textTrackNumber, setTextTrackNumber] = useState(0);
+
+    function getSubtitle() {
+        if (!myVideo.current) return;
+        var track = myVideo.current.textTracks[0];
+        // track.mode = "hidden";
+        // var throwAwayDiv = document.createElement("div");
+
+        track.oncuechange = () => {
+            if (track.activeCues.length) {
+                track.activeCues[0].line = -3;
+                track.activeCues[0].align = "left";
+            }
+        };
+    }
 
     return (
         <div className="flex items-center justify-center bg-black">
@@ -374,25 +391,32 @@ const MediaPlayer = () => {
                 }}
             >
                 <div className="h-screen w-screen flex justify-center items-center overflow-hidden">
-                    <video loop={isLoop} width="auto" src={videoArray[videoNumber].videoURL} ref={myVideo} className="w-full h-full" id="myVideoID" onLoadedMetadata={handleLoadedMetadata}>
-                        {/* <track className="z-10 absolute bottom-24" label="English" kind="subtitles" srclang="en" src={videoArray[videoNumber].subtitleURL} default /> */}
+                    <video loop={isLoop} width="auto" src={videoArray[videoNumber].videoURL} ref={myVideo} className="w-full h-full" id="myVideoID" onLoadedMetadata={handleLoadedMetadata} type="video/mp4" poster={videoArray[videoNumber].posterURL}>
+                        <track label="English" kind="subtitles" srcLang="en" src={videoArray[videoNumber].subtitleURL} default />
                     </video>
                 </div>
-                {/* opacity-0 hover:opacity-100 */}
-                {/* style={coverOpacity} ref={videoCover} */}
-                <div className="h-full w-[100%] top-0 absolute z-10 bg-gradient-to-t from-[#000000ef] via-[#00000099] to-[#000000ef] opacity-100 transition-all duration-500 coverShadow overflow-hidden" style={coverOpacity} ref={videoCover}>
+
+                <div className="h-full w-[100%] top-0 absolute z-10 bg-gradient-to-t from-[#000000] via-[#00000032] to-[#000000] opacity-100 transition-all duration-500 coverShadow overflow-hidden" style={coverOpacity} ref={videoCover}>
                     <div title="videoTitle" className="absolute z-20 text-white text-[64px] pt-8 pl-10 font-semibold -mt-48 transition-all duration-700 videoTitle tracking-wide drop-shadow-md">
                         {videoArray[videoNumber].videoName}
                     </div>
 
                     <div className="h-full w-full absolute z-20 flex justify-center items-center select-none ">
-                        <div className="flex-row justify-center flex opacity-0 hover:opacity-100 transition-all duration-500 py-6 group">
+                        <div
+                            className="flex-row justify-center flex opacity-0 hover:opacity-100 transition-all duration-500 py-6 group"
+                            onDoubleClick={(e) => {
+                                e.stopPropagation();
+                                e.nativeEvent.stopImmediatePropagation();
+                            }}
+                        >
                             <div
-                                className="focus:outline-none cursor-pointer mx-4 flex  justify-center items-center hover:transform hover:scale-[1.18]  active:transform active:scale-90 transition-all pr-16 pl-0 group-hover:pr-0 group-hover:pl-16 duration-300 opacity-0 group-hover:opacity-100 "
+                                className="focus:outline-none cursor-pointer mx-4 flex  justify-center items-center hover:transform active:transform active:scale-90 transition-all pr-16 pl-0 group-hover:pr-0 group-hover:pl-16 duration-300 opacity-0 group-hover:opacity-100 "
                                 onClick={() => handleDecrementTime()}
                             >
-                                <img src="./svg/backward.svg" className="h-24 w-24" alt="" />
-                                <p className="text-5xl text-white pl-5 pr-3 drop-shadow-lg">10</p>
+                                <div className=" focus:outline-none active:outline-none p-3 hover:bg-[#00000084] hover:scale-[1.15] transition-all rounded-full duration-300 active:scale-[0.85] flex flex-row aspect-square items-center justify-center hover:transform hover:shadow-lg mx-2">
+                                    <img src="./svg/backward.svg" className="h-24 w-24" alt="" />
+                                    <p className="text-5xl text-white pl-5 pr-3 drop-shadow-lg">10</p>
+                                </div>
                             </div>
 
                             <button className="focus:outline-none active:outline-none  flex justify-center items-center  duration-300 transition-all rounded-full aspect-square scale-0 group-hover:scale-100 " onClick={() => togglePlaying()}>
@@ -403,16 +427,24 @@ const MediaPlayer = () => {
                             </button>
 
                             <div
-                                className="focus:outline-none cursor-pointer mx-4 flex justify-center items-center active:transform active:scale-90 transition-all hover:transform hover:scale-[1.18] pl-16 pr-0 opacity-0 group-hover:opacity-100 group-hover:pl-0 group-hover:pr-16 duration-300"
+                                className="focus:outline-none cursor-pointer mx-4 flex justify-center items-center active:transform active:scale-90 transition-all hover:transform pl-16 pr-0 opacity-0 group-hover:opacity-100 group-hover:pl-0 group-hover:pr-16 duration-300"
                                 onClick={() => handleIncrementTime()}
                             >
-                                <p className="text-5xl text-white pr-5 pl-3 drop-shadow-lg">10</p>
-                                <img src="./svg/forward.svg" className="h-24 w-24" alt="" />
+                                <div className=" focus:outline-none active:outline-none p-3 hover:bg-[#00000084] hover:scale-[1.15] transition-all rounded-full duration-300 active:scale-[0.85] flex flex-row aspect-square items-center justify-center hover:transform hover:shadow-lg mx-2">
+                                    <p className="text-5xl text-white pr-5 pl-3 drop-shadow-lg">10</p>
+                                    <img src="./svg/forward.svg" className="h-24 w-24" alt="" />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="absolute z-20 bottom-0 w-full px-4 pb-3 select-none -mb-48 transition-all duration-700 videoControls">
+                    <div
+                        className="absolute z-20 bottom-0 w-full px-4 pb-3 select-none -mb-48 transition-all duration-700 videoControls"
+                        onDoubleClick={(e) => {
+                            e.stopPropagation();
+                            e.nativeEvent.stopImmediatePropagation();
+                        }}
+                    >
                         <div className="flex w-full items-center ">
                             <div className="h-[3px] group flex flex-row hover:h-[6px] mx-3 box-border w-full bg-gray-300 rounded cursor-pointer transition-all duration-100 relative items-center" onClick={(event) => handleProgressBarClick(event)} ref={myProgressBarBase}>
                                 <div className="h-full bg-[#1653f0] box-border flex w-0 items-center justify-end rounded " ref={myProgressBar}></div>
@@ -619,7 +651,10 @@ const MediaPlayer = () => {
                                 </div>
                                 <button className="focus:outline-none active:outline-none rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-2 hover:mt-1 hover:mb-1 active:scale-75" title="Subtitles">
                                     <svg className="h-8 w-8" viewBox="0 0 24 24" title="Subtitles">
-                                        <path fill="#fff" d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M4,12H8V14H4V12M14,18H4V16H14V18M20,18H16V16H20V18M20,14H10V12H20V14Z" />
+                                        <path
+                                            fill="#fff"
+                                            d="M18.75 4C20.5449 4 22 5.45507 22 7.25V16.7546C22 18.5495 20.5449 20.0046 18.75 20.0046H5.25C3.45507 20.0046 2 18.5495 2 16.7546V7.25C2 5.51697 3.35645 4.10075 5.06558 4.00514L5.25 4H18.75ZM18.75 5.5H5.25L5.10647 5.5058C4.20711 5.57881 3.5 6.33183 3.5 7.25V16.7546C3.5 17.7211 4.2835 18.5046 5.25 18.5046H18.75C19.7165 18.5046 20.5 17.7211 20.5 16.7546V7.25C20.5 6.2835 19.7165 5.5 18.75 5.5ZM5.5 12C5.5 8.85442 8.21322 7.22469 10.6216 8.59854C10.9814 8.80378 11.1067 9.26183 10.9015 9.62162C10.6962 9.98141 10.2382 10.1067 9.87838 9.90146C8.48071 9.10417 7 9.99357 7 12C7 14.0046 8.48411 14.8962 9.8792 14.1027C10.2392 13.8979 10.6971 14.0238 10.9019 14.3838C11.1067 14.7439 10.9809 15.2018 10.6208 15.4066C8.21539 16.7747 5.5 15.1433 5.5 12ZM13 12C13 8.85442 15.7132 7.22469 18.1216 8.59854C18.4814 8.80378 18.6067 9.26183 18.4015 9.62162C18.1962 9.98141 17.7382 10.1067 17.3784 9.90146C15.9807 9.10417 14.5 9.99357 14.5 12C14.5 14.0046 15.9841 14.8962 17.3792 14.1027C17.7392 13.8979 18.1971 14.0238 18.4019 14.3838C18.6067 14.7439 18.4809 15.2018 18.1208 15.4066C15.7154 16.7747 13 15.1433 13 12Z"
+                                        />
                                     </svg>
                                 </button>
 
