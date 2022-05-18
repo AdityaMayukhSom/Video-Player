@@ -375,7 +375,6 @@ const MediaPlayer = () => {
 
         track.oncuechange = () => {
             if (track.activeCues.length) {
-                track.activeCues[0].line = -3;
                 track.activeCues[0].align = "left";
             }
         };
