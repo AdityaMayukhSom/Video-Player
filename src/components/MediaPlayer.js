@@ -406,9 +406,13 @@ const MediaPlayer = () => {
 
         track.oncuechange = () => {
             if (track.activeCues.length) {
+<<<<<<< HEAD
                 setTextTrack(track.activeCues[0].text);
             } else {
                 setTextTrack(null);
+=======
+                track.activeCues[0].align = "left";
+>>>>>>> adding_cinecode
             }
         };
     }
