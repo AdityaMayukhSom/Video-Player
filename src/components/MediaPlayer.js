@@ -6,27 +6,32 @@ const MediaPlayer = () => {
 
     const opacityNull = { opacity: 0, pointerEvents: "none", cursor: "none" };
     const opacityFull = { opacity: 1, pointerEvents: "all", cursor: "auto" };
+    const bottomZero = { marginBottom: "20px" };
+    const bottomFull = { marginBottom: "100px" };
     let videoArray = [
+        { videoName: "Star Trek Beyond", videoURL: "./videos/Star Trek Beyond 2016.mp4", subtitleURL: "./subtitle/Star Trek Beyond 2016.vtt", posterURL: "./images/Star Trek Beyond 2016.jpg" },
         { videoName: "Pasoori", videoURL: "./videos/Pasoori.mp4", subtitleURL: "./subtitle/Pasoori.vtt", posterURL: "./images/Pasoori.jpg" },
+        { videoName: "Moon Knight", videoURL: "./videos/Moon.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Moon Knight.jpg" },
         { videoName: "Baraat", videoURL: "./videos/Baraat.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Baraat.jpeg" },
         { videoName: "O Je Mane Na Mana", videoURL: "./videos/ManeNaMana.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
         { videoName: "Komola", videoURL: "./videos/Komola.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
         { videoName: "Thor Love And Thunder", videoURL: "./videos/Thor.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
         { videoName: "Ms. Marvel", videoURL: "./videos/Marvel.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
-        { videoName: "Moon Knight", videoURL: "./videos/Moon.mp4", subtitleURL: "./subtitle/mySubtitle.vtt", posterURL: "./images/Pasoori.jpg" },
     ];
     const [isPlaying, setIsPlaying] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [videoNumber, setVideoNumber] = useState(0);
-    const [videoPlayingFor, setVideoPlayingFor] = useState("00:00");
+    const [videoPlayingFor, setVideoPlayingFor] = useState("00:00:00");
     const [totalTiming, setTotalTiming] = useState(0);
     const [coverOpacity, setCoverOpacity] = useState(opacityFull);
     const [fullScreenIcon, setFullScreenIcon] = useState(true);
     const [isShowNextEpisode, setIsShowNextEpisode] = useState(false);
     const [isLoop, setIsLoop] = useState(false);
-    const [volumeFactor, setVolumeFactor] = useState(0.03);
+    const [volumeFactor, setVolumeFactor] = useState(0.1);
     const [previousVolumeFactor, setPreviousVolumeFactor] = useState(1);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
+    const [subtitleBottomDistance, setSubtitleBottomDistance] = useState(bottomFull);
+    const [isShowSubtitle, setIsShowSubtitle] = useState(false);
 
     const myVideo = useRef(null);
     const myVideoPlayer = useRef(null);
@@ -46,17 +51,33 @@ const MediaPlayer = () => {
     const speed125 = useRef(null);
     const speed150 = useRef(null);
 
+    const duration = convertHMS(totalTiming);
+
     function convertHMS(value) {
         const sec = parseInt(value, 10); // convert value to number if it's string
-        let minutes = parseInt(sec / 60); // get minutes
-        let seconds = sec - minutes * 60; //  get seconds
+        var hours = Math.floor(sec / 3600);
+        var minutes = Math.floor((sec % 3600) / 60);
+        var seconds = Math.floor((sec % 3600) % 60);
+        // if (totalTiming < 3600) {
+        //     if (minutes < 10) {
+        //         minutes = "0" + minutes;
+        //     }
+        //     if (seconds < 10) {
+        //         seconds = "0" + seconds;
+        //     }
+        //     return minutes + ":" + seconds; // Return is MM : SS
+        // } else {
+        if (hours < 10) {
+            hours = "0" + hours;
+        }
         if (minutes < 10) {
             minutes = "0" + minutes;
         }
         if (seconds < 10) {
             seconds = "0" + seconds;
         }
-        return minutes + ":" + seconds; // Return is MM : SS
+        return hours + ":" + minutes + ":" + seconds; // Return is HH : MM : SS
+        // }
     }
 
     const incrementVideo = () => {
@@ -65,7 +86,7 @@ const MediaPlayer = () => {
         } else {
             setVideoNumber(0);
         }
-
+        setTextTrack(null);
         setIsPlaying(false);
     };
     const decrementVideo = () => {
@@ -74,7 +95,17 @@ const MediaPlayer = () => {
         } else {
             setVideoNumber(videoArray.length - 1);
         }
+        setTextTrack(null);
+        setIsPlaying(false);
+    };
 
+    const nextEpisode = () => {
+        if (videoNumber < videoArray.length - 1) {
+            setVideoNumber(videoNumber + 1);
+        } else {
+            setVideoNumber(0);
+        }
+        setTextTrack(null);
         setIsPlaying(false);
     };
 
@@ -90,6 +121,7 @@ const MediaPlayer = () => {
             myVideo.current.pause();
             clearInterval(timingID.current);
             setCoverOpacity(opacityFull);
+            setSubtitleBottomDistance(bottomFull);
         } else {
             setIsPlaying(true);
             myVideo.current.play();
@@ -104,18 +136,6 @@ const MediaPlayer = () => {
         } else {
             setShowSettings(true);
         }
-    };
-
-    const duration = convertHMS(totalTiming);
-
-    const nextEpisode = () => {
-        if (videoNumber < videoArray.length - 1) {
-            setVideoNumber(videoNumber + 1);
-        } else {
-            setVideoNumber(0);
-        }
-
-        setIsPlaying(false);
     };
 
     const getFullScreenElement = (elem) => {
@@ -173,10 +193,14 @@ const MediaPlayer = () => {
 
         document.onmousemove = () => {
             setCoverOpacity(opacityFull);
+            setSubtitleBottomDistance(bottomFull);
+
             ResetTimers();
         };
         document.onmouseleave = () => {
             setCoverOpacity(opacityNull);
+            setSubtitleBottomDistance(bottomZero);
+
             clearTimeout(timeoutTimer);
         };
     }, [videoCover]);
@@ -194,6 +218,7 @@ const MediaPlayer = () => {
 
     function IdleTimeout() {
         setCoverOpacity(opacityNull);
+        setSubtitleBottomDistance(bottomZero);
     }
 
     //This is code for full screen handling
@@ -275,7 +300,6 @@ const MediaPlayer = () => {
     function handleProgressBarClick(e) {
         setTotalTiming(myVideo.current.duration);
         let position = Math.abs(e.clientX - myProgressBarBase.current.getBoundingClientRect().left);
-
         myVideo.current.currentTime = (position / progressBarBaseWidth) * totalTiming;
     }
 
@@ -324,6 +348,14 @@ const MediaPlayer = () => {
         }
     }
 
+    function handleSubtitle() {
+        if (isShowSubtitle) {
+            setIsShowSubtitle(false);
+        } else {
+            setIsShowSubtitle(true);
+        }
+    }
+
     useEffect(() => {
         //Code to check if to show Next Episode
 
@@ -359,24 +391,24 @@ const MediaPlayer = () => {
                 myVideo.current.pause();
                 setIsPlaying(false);
                 setCoverOpacity(opacityFull);
+                setSubtitleBottomDistance(bottomFull);
             }
         };
-
         getSubtitle();
     });
 
-    // const [textTrackNumber, setTextTrackNumber] = useState(0);
+    const [textTrack, setTextTrack] = useState(null);
 
     function getSubtitle() {
         if (!myVideo.current) return;
-        var track = myVideo.current.textTracks[0];
-        // track.mode = "hidden";
-        // var throwAwayDiv = document.createElement("div");
+        let track = myVideo.current.textTracks[0];
+        track.mode = "hidden";
 
         track.oncuechange = () => {
             if (track.activeCues.length) {
-                track.activeCues[0].line = -3;
-                track.activeCues[0].align = "left";
+                setTextTrack(track.activeCues[0].text);
+            } else {
+                setTextTrack(null);
             }
         };
     }
@@ -395,15 +427,24 @@ const MediaPlayer = () => {
                         <track label="English" kind="subtitles" srcLang="en" src={videoArray[videoNumber].subtitleURL} default />
                     </video>
                 </div>
-
-                <div className="h-full w-[100%] top-0 absolute z-10 bg-gradient-to-t from-[#000000] via-[#00000032] to-[#000000] opacity-100 transition-all duration-500 coverShadow overflow-hidden" style={coverOpacity} ref={videoCover}>
-                    <div title="videoTitle" className="absolute z-20 text-white text-[64px] pt-8 pl-10 font-semibold -mt-48 transition-all duration-700 videoTitle tracking-wide drop-shadow-md">
+                {isShowSubtitle && (
+                    <pre
+                        className="w-screen absolute text-center text-white duration-500 text-lg sm:text-2xl md:text-3xl lg:text-5xl bottom-12 sm:bottom-0 sm:mb-16 transition-all  font-semibold tracking-wide pointer-events-none font-inconsolata"
+                        id="subtitle"
+                        style={subtitleBottomDistance}
+                        data-name="subtitle"
+                    >
+                        {textTrack}
+                    </pre>
+                )}
+                <div className="h-full w-[100%] top-0 absolute z-10 opacity-100 transition-all duration-500 coverShadow overflow-hidden" style={coverOpacity} ref={videoCover}>
+                    <div title="videoTitle" className="absolute w-full z-20 text-white text-4xl  sm:text-5xl md:text-6xl pt-8 pl-10 font-semibold -mt-28 transition-all duration-700 videoTitle tracking-wide drop-shadow-md bg-gradient-to-b from-[#000000] to-[#00000000]">
                         {videoArray[videoNumber].videoName}
                     </div>
 
                     <div className="h-full w-full absolute z-20 flex justify-center items-center select-none ">
                         <div
-                            className="flex-row justify-center flex opacity-0 hover:opacity-100 transition-all duration-500 py-6 group"
+                            className="flex-row justify-center hidden  md:flex opacity-0 hover:opacity-100 transition-all duration-500 py-6 group"
                             onDoubleClick={(e) => {
                                 e.stopPropagation();
                                 e.nativeEvent.stopImmediatePropagation();
@@ -439,23 +480,23 @@ const MediaPlayer = () => {
                     </div>
 
                     <div
-                        className="absolute z-20 bottom-0 w-full px-4 pb-3 select-none -mb-48 transition-all duration-700 videoControls"
+                        className="absolute z-20 bottom-0 w-full px-4 pb-3 select-none -mb-28 transition-all duration-700 videoControls bg-gradient-to-t from-[#000000] to-[#00000000] pt-4"
                         onDoubleClick={(e) => {
                             e.stopPropagation();
                             e.nativeEvent.stopImmediatePropagation();
                         }}
                     >
                         <div className="flex w-full items-center ">
-                            <div className="h-[3px] group flex flex-row hover:h-[6px] mx-3 box-border w-full bg-gray-300 rounded cursor-pointer transition-all duration-100 relative items-center" onClick={(event) => handleProgressBarClick(event)} ref={myProgressBarBase}>
-                                <div className="h-full bg-[#1653f0] box-border flex w-0 items-center justify-end rounded " ref={myProgressBar}></div>
-                                <div className="rounded-full w-4 box-border h-4  scale-0 group-hover:scale-100 transition-all ease-in-out duration-200 bg-white shadow z-10 absolute" ref={progressSlider}></div>
+                            <div className="h-[3px] group flex flex-row hover:h-[6px] mx-3 box-border w-full bg-gray-300 rounded cursor-pointer transition-all duration-100 relative items-center" onClick={(event) => handleProgressBarClick(event)} ref={myProgressBarBase} id="myProgressBarBase">
+                                <div className="h-full bg-[#1653f0] box-border flex w-0 items-center justify-end rounded " ref={myProgressBar} id="myProgressBar"></div>
+                                <div className="rounded-full w-4 box-border h-4  scale-0 group-hover:scale-100 transition-all ease-in-out duration-200 bg-white shadow z-10 absolute" ref={progressSlider} id="progressSlider"></div>
                             </div>
-                            <div className="px-1 font-semibold text-lg text-white w-[120px] text-right drop-shadow-lg">
+                            <div className="px-1 font-semibold text-lg text-white text-right drop-shadow-lg" style={{ width: "195px" }}>
                                 {videoPlayingFor}&nbsp;/&nbsp;{duration}
                             </div>
                         </div>
 
-                        <div className="flex w-full items-center justify-between text-xs font-medium text-gray-500 pl-3">
+                        <div className="flex flex-col sm:flex-row w-full items-center justify-between text-xs font-medium text-gray-500 pl-4">
                             {isShowNextEpisode && (
                                 <div
                                     className="text-gray-900 bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:outline-none font-medium rounded text-base px-5 py-2.5 text-center inline-flex items-center focus:ring-gray-500 mr-2 mb-2 absolute -translate-y-20 transition-all duration-700 cursor-pointer"
@@ -468,36 +509,50 @@ const MediaPlayer = () => {
                                 </div>
                             )}
                             <div className="flex items-center">
-                                <button className="focus:outline-none active:outline-none transform active:scale-75 items-center justify-center transition-all duration-500 rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 mt-2" onClick={() => togglePlaying()}>
-                                    <div className={isPlaying ? `h-10` : `hidden`} title="Pause">
-                                        <img src="./svg/pause.svg" className="w-full h-full" alt="" />
+                                <div className="flex group relative items-center">
+                                    <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-[4.7rem] mb-12 group-hover:mb-0 py-2 px-3 text-lg text-white rounded -left-4 text-center bg-[#262626] bg-opacity-[0.9] shadow-md duration-700 w-20">
+                                        {isPlaying ? "Pause" : "Play"}
                                     </div>
-
-                                    <div className={isPlaying ? `hidden ` : `h-10`} title="Play">
-                                        <img src="./svg/play.svg" className="w-full h-full" alt="" />
-                                    </div>
-                                </button>
+                                    <button
+                                        className="focus:outline-none active:outline-none transform active:scale-75 items-center justify-center transition-all duration-500 rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 mt-1 group-hover:mt-0 group-hover:mb-1"
+                                        onClick={() => togglePlaying()}
+                                    >
+                                        {isPlaying ? (
+                                            <div className="h-9" title="Pause">
+                                                <img src="./svg/pause.svg" className="w-full h-full" alt="" />
+                                            </div>
+                                        ) : (
+                                            <div className="h-9" title="Play">
+                                                <img src="./svg/play.svg" className="w-full h-full" alt="" />
+                                            </div>
+                                        )}
+                                    </button>
+                                </div>
                                 <div className="px-1 flex flex-row justify-center items-center ">
-                                    <div className=" w-0.5 bg-opacity-50 bg-gray-200 h-8 py-2 mt-1 ml-2 mr-1"></div>
-                                    <button className="focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-1  justify-center items-center flex mt-2 hover:mt-1 hover:mb-1 active:scale-75" onClick={() => decrementVideo()}>
+                                    <div className=" w-0.5 bg-opacity-50 bg-gray-200 h-8 py-2 mt-0 ml-2 mr-1"></div>
+                                    <button className="focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-1  justify-center items-center flex mt-1 hover:mt-0 hover:mb-1 active:scale-75" onClick={() => decrementVideo()}>
                                         <svg className="w-10 h-10" viewBox="0 0 24 24" title="Decrement Video">
                                             <path fill="#fff" d="M6,6H8V18H6M9.5,12L18,18V6M16,14.14L12.97,12L16,9.86V14.14Z" />
                                         </svg>
                                     </button>
-                                    <button className="focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-2  justify-center items-center flex mt-2 hover:mt-1 hover:mb-1 active:scale-75">
-                                        <svg className="w-6 h-6" viewBox="0 0 24 24" title="Stop Video">
-                                            <path fill="#fff" d="M2 2h20v20h-20z" />
+                                    <button className="focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-1  justify-center items-center flex mt-1 hover:mt-0 hover:mb-1 active:scale-75">
+                                        <svg className="w-8 h-8" viewBox="0 0 24 24" title="Stop Video">
+                                            <path fill="#fff" d="M5,3H19A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5A2,2 0 0,1 3,19V5A2,2 0 0,1 5,3M13,13V7H11V13H13M13,17V15H11V17H13Z" />
                                         </svg>
                                     </button>
-                                    <button className=" focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-1  justify-center items-center flex mt-2 hover:mt-1 hover:mb-1 active:scale-75" onClick={() => incrementVideo()}>
+                                    <button className=" focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-1  justify-center items-center flex mt-1 hover:mt-0 hover:mb-1 active:scale-75" onClick={() => incrementVideo()}>
                                         <svg className="h-10 w-10" viewBox="0 0 24 24" title="Increment Video">
                                             <path fill="#fff" d="M6,18L14.5,12L6,6M8,9.86L11.03,12L8,14.14M16,6H18V18H16" />
                                         </svg>
                                     </button>
-                                    <div className=" w-0.5 bg-opacity-50 bg-gray-200 h-8 py-2 mt-1 mr-2 ml-1"></div>
+                                    <div className=" w-0.5 bg-opacity-50 bg-gray-200 h-8 py-2 mt-0 mr-2 ml-1"></div>
                                 </div>
 
-                                <div className="group flex flex-row items-center text-white mt-2">
+                                <div className="group flex flex-row items-center text-white mt-1">
+                                    {/* <div className="flex group relative items-center"> */}
+                                    {/* <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-[5.5rem] mb-12 group-hover:mb-0 py-2 px-3 text-lg text-white rounded -left-12 text-center bg-[#262626] bg-opacity-[0.9] shadow-md duration-700">
+                                            {volumeFactor === 0 ? "Click To Unmute" : "Click To Mute"}
+                                        </div> */}
                                     <button
                                         className="focus:outline-none active:outline-none transition-all  rounded aspect-square group-hover:bg-gray-300  group-hover:bg-opacity-10 duration-300 p-2 flex justify-center items-center active:scale-75"
                                         onClick={() => {
@@ -516,6 +571,7 @@ const MediaPlayer = () => {
                                             )}
                                         </svg>
                                     </button>
+                                    {/* </div> */}
 
                                     <div className="h-1 mx-3 w-0 group-hover:w-[100px] transition-all duration-300 bg-gray-300 rounded cursor-pointer flex items-center relative" onClick={(e) => handleVolumeBarClick(e)} ref={myVolumeBar}>
                                         <div className="h-full bg-[#1653f0] w-full group flex justify-end items-center rounded " style={{ width: `${volumeFactor * 100}%` }}></div>
@@ -525,11 +581,11 @@ const MediaPlayer = () => {
                             </div>
 
                             <div className="flex items-center">
-                                <div className="flex group relative mr-4 items-center mt-2">
-                                    <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-16 mb-12 group-hover:mb-0 py-1.5 px-3 text-lg text-white rounded -left-16 bg-[#262626] bg-opacity-95 duration-700">
+                                <div className="flex group relative mr-4 items-center mt-1">
+                                    <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-16 mb-12 group-hover:mb-0 py-1.5 px-3 text-lg text-white rounded -left-16 bg-[#262626] bg-opacity-95 duration-700 ">
                                         {isAutoPlay ? "Autoplay Is On" : "Autoplay Is Off"}
                                     </div>
-                                    <input className="appearance-none w-8 rounded float-left h-3 bg-gray-400 checked:bg-[#1653f0] focus:outline-none cursor-pointer shadow-sm" type="checkbox" role="switch" id="autoPlayCheckBox" ref={autoPlayCheckButton} onChange={() => autoPlayHandler()} />
+                                    <input className="appearance-none w-8 rounded-lg float-left h-3 bg-gray-400 checked:bg-[#1653f0] focus:outline-none cursor-pointer shadow-sm" type="checkbox" role="switch" id="autoPlayCheckBox" ref={autoPlayCheckButton} onChange={() => autoPlayHandler()} />
                                     <label htmlFor="autoPlayCheckBox" className="bg-white  rounded-full flex justify-center items-center h-5 w-5 absolute cursor-pointer duration-500 transition-all" style={checkButtonTransition}>
                                         {isAutoPlay && (
                                             <svg className="h-4 w-4" viewBox="0 0 24 24">
@@ -544,17 +600,31 @@ const MediaPlayer = () => {
                                     </label>
                                 </div>
                                 <div className="group">
-                                    <button className="focus:outline-none active:outline-none rounded aspect-square group-hover:bg-gray-300 group-hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-2 group-hover:mt-1 group-hover:mb-1">
-                                        <svg className="h-8 w-8" viewBox="0 0 24 24" title="Loop">
-                                            <path
-                                                fill="#fff"
-                                                d="M12,16A3,3 0 0,1 9,13C9,11.88 9.61,10.9 10.5,10.39L20.21,4.77L14.68,14.35C14.18,15.33 13.17,16 12,16M12,3C13.81,3 15.5,3.5 16.97,4.32L14.87,5.53C14,5.19 13,5 12,5A8,8 0 0,0 4,13C4,15.21 4.89,17.21 6.34,18.65H6.35C6.74,19.04 6.74,19.67 6.35,20.06C5.96,20.45 5.32,20.45 4.93,20.07V20.07C3.12,18.26 2,15.76 2,13A10,10 0 0,1 12,3M22,13C22,15.76 20.88,18.26 19.07,20.07V20.07C18.68,20.45 18.05,20.45 17.66,20.06C17.27,19.67 17.27,19.04 17.66,18.65V18.65C19.11,17.2 20,15.21 20,13C20,12 19.81,11 19.46,10.1L20.67,8C21.5,9.5 22,11.18 22,13Z"
-                                            />
+                                    <button className="focus:outline-none active:outline-none rounded aspect-square group-hover:bg-gray-300 group-hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-1 group-hover:mt-0 group-hover:mb-1">
+                                        <svg className="h-8 w-8" viewBox="0 0 24 24" title="Playback Speed">
+                                            {playbackSpeed < 1 && (
+                                                <path
+                                                    fill="#fff"
+                                                    d="M12 16C13.66 16 15 14.66 15 13C15 11.88 14.39 10.9 13.5 10.39L3.79 4.77L9.32 14.35C9.82 15.33 10.83 16 12 16M12 3C10.19 3 8.5 3.5 7.03 4.32L9.13 5.53C10 5.19 11 5 12 5C16.42 5 20 8.58 20 13C20 15.21 19.11 17.21 17.66 18.65H17.65C17.26 19.04 17.26 19.67 17.65 20.06C18.04 20.45 18.68 20.45 19.07 20.07C20.88 18.26 22 15.76 22 13C22 7.5 17.5 3 12 3M2 13C2 15.76 3.12 18.26 4.93 20.07C5.32 20.45 5.95 20.45 6.34 20.06C6.73 19.67 6.73 19.04 6.34 18.65C4.89 17.2 4 15.21 4 13C4 12 4.19 11 4.54 10.1L3.33 8C2.5 9.5 2 11.18 2 13Z"
+                                                />
+                                            )}
+                                            {playbackSpeed === 1 && (
+                                                <path
+                                                    fill="#fff"
+                                                    d="M12 1.38L9.14 12.06C8.8 13.1 9.04 14.29 9.86 15.12C11.04 16.29 12.94 16.29 14.11 15.12C14.9 14.33 15.16 13.2 14.89 12.21M14.6 3.35L15.22 5.68C18.04 6.92 20 9.73 20 13C20 15.21 19.11 17.21 17.66 18.65H17.65C17.26 19.04 17.26 19.67 17.65 20.06C18.04 20.45 18.68 20.45 19.07 20.07C20.88 18.26 22 15.76 22 13C22 8.38 18.86 4.5 14.6 3.35M9.4 3.36C5.15 4.5 2 8.4 2 13C2 15.76 3.12 18.26 4.93 20.07C5.32 20.45 5.95 20.45 6.34 20.06C6.73 19.67 6.73 19.04 6.34 18.65C4.89 17.2 4 15.21 4 13C4 9.65 5.94 6.86 8.79 5.65"
+                                                />
+                                            )}
+                                            {playbackSpeed > 1 && (
+                                                <path
+                                                    fill="#fff"
+                                                    d="M12,16A3,3 0 0,1 9,13C9,11.88 9.61,10.9 10.5,10.39L20.21,4.77L14.68,14.35C14.18,15.33 13.17,16 12,16M12,3C13.81,3 15.5,3.5 16.97,4.32L14.87,5.53C14,5.19 13,5 12,5A8,8 0 0,0 4,13C4,15.21 4.89,17.21 6.34,18.65H6.35C6.74,19.04 6.74,19.67 6.35,20.06C5.96,20.45 5.32,20.45 4.93,20.07V20.07C3.12,18.26 2,15.76 2,13A10,10 0 0,1 12,3M22,13C22,15.76 20.88,18.26 19.07,20.07V20.07C18.68,20.45 18.05,20.45 17.66,20.06C17.27,19.67 17.27,19.04 17.66,18.65V18.65C19.11,17.2 20,15.21 20,13C20,12 19.81,11 19.46,10.1L20.67,8C21.5,9.5 22,11.18 22,13Z"
+                                                />
+                                            )}
                                         </svg>
                                     </button>
 
                                     <div className=" absolute rounded-lg right-[8.5rem] bottom-[4.5rem] bg-opacity-95 shadow-lg text-white bg-[#262626] px-4 py-6 transition-all mb-12 group-hover:mb-0 group-hover:visible invisible opacity-0 group-hover:opacity-100 duration-700 ">
-                                        <div className="mb-8 text-4xl px-2.5 flex flex-row">
+                                        <div className="mb-8 text-4xl px-2.5 flex flex-row ">
                                             <p> Playback Speed</p>
                                             <img src="./rocket.png" alt="" className=" ml-4 mt-1.5 invert h-8" />
                                         </div>
@@ -601,19 +671,32 @@ const MediaPlayer = () => {
                                     </div>
                                 </div>
 
-                                <div className="" title="Setting Icon And Box">
-                                    <button className="focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-1 mx-1 mt-2 hover:mt-1 hover:mb-1 active:scale-75" title="Settings" onClick={() => toggleSettings()}>
+                                <div className="mx-1" title="Setting Icon And Box">
+                                    <button className="focus:outline-none active:outline-none transition-all  rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 duration-300 p-1 mt-1 hover:mt-0 hover:mb-1 active:scale-75" title="Settings" onClick={() => toggleSettings()}>
                                         <svg className="h-8 w-8" viewBox="0 0 24 24" title="Settings">
                                             <path fill="#fff" d="M7 3H5V9H7V3M19 3H17V13H19V3M3 13H5V21H7V13H9V11H3V13M15 7H13V3H11V7H9V9H15V7M11 21H13V11H11V21M15 15V17H17V21H19V17H21V15H15Z" />
                                         </svg>
                                     </button>
-                                    <div className={showSettings ? "" : "hidden"}>
-                                        <div id="settingsBox" className=" z-10 absolute -translate-x-16 -translate-y-64 divide-y divide-gray-100 rounded shadow w-60 bg-[#262626] ">
+
+                                    {showSettings && (
+                                        <div id="settingsBox" className="transition-all duration-1000 z-10 absolute -translate-x-28 bottom-28 divide-y divide-gray-100 rounded shadow w-64 bg-[#262626]">
                                             <ul className="py-1 text-sm text-gray-200" aria-labelledby="dropdownDefault">
                                                 <li>
                                                     <div className="flex w-full px-4 py-4 hover:bg-[#434343] hover:text-white justify-between">
-                                                        <span>Quality</span>
-                                                        <span>720px</span>
+                                                        <span>Subtitle Language</span>
+                                                        <span>English</span>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div className="flex w-full px-4 py-4 hover:bg-[#434343] hover:text-white justify-between">
+                                                        <span>Subtitle Font</span>
+                                                        <span>Roboto</span>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div className="flex w-full px-4 py-4 hover:bg-[#434343] hover:text-white justify-between">
+                                                        <span>Subtitle Font Size</span>
+                                                        <span>32</span>
                                                     </div>
                                                 </li>
                                                 <li>
@@ -633,14 +716,14 @@ const MediaPlayer = () => {
                                                 </li>
                                             </ul>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                                 <div className="flex group relative items-center">
-                                    <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-[5.5rem] mb-12 group-hover:mb-0 py-2 px-3 text-lg text-white rounded -left-20 w-48  text-center bg-[#262626] bg-opacity-[0.9] shadow-md duration-700">
+                                    <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-[5.5rem] mb-12 group-hover:mb-0 py-2 px-3 text-lg text-white rounded -left-20 w-48  text-center bg-[#262626] bg-opacity-[0.9] shadow-md duration-700 pointer-events-none ">
                                         {isLoop ? "Loop Activated" : "Loop Deactivated"}
                                     </div>
 
-                                    <button className="focus:outline-none active:outline-none rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-2 hover:mt-1 hover:mb-1 active:scale-75" title="Loop" onClick={() => handleLoop()}>
+                                    <button className="focus:outline-none active:outline-none rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-1 hover:mt-0 hover:mb-1 active:scale-75" title="Loop" onClick={() => handleLoop()}>
                                         <svg className="h-8 w-8" viewBox="0 0 24 24" title="Loop">
                                             <path
                                                 fill={isLoop ? "#1653f0" : "#fff"}
@@ -649,27 +732,48 @@ const MediaPlayer = () => {
                                         </svg>
                                     </button>
                                 </div>
-                                <button className="focus:outline-none active:outline-none rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-2 hover:mt-1 hover:mb-1 active:scale-75" title="Subtitles">
-                                    <svg className="h-8 w-8" viewBox="0 0 24 24" title="Subtitles">
-                                        <path
-                                            fill="#fff"
-                                            d="M18.75 4C20.5449 4 22 5.45507 22 7.25V16.7546C22 18.5495 20.5449 20.0046 18.75 20.0046H5.25C3.45507 20.0046 2 18.5495 2 16.7546V7.25C2 5.51697 3.35645 4.10075 5.06558 4.00514L5.25 4H18.75ZM18.75 5.5H5.25L5.10647 5.5058C4.20711 5.57881 3.5 6.33183 3.5 7.25V16.7546C3.5 17.7211 4.2835 18.5046 5.25 18.5046H18.75C19.7165 18.5046 20.5 17.7211 20.5 16.7546V7.25C20.5 6.2835 19.7165 5.5 18.75 5.5ZM5.5 12C5.5 8.85442 8.21322 7.22469 10.6216 8.59854C10.9814 8.80378 11.1067 9.26183 10.9015 9.62162C10.6962 9.98141 10.2382 10.1067 9.87838 9.90146C8.48071 9.10417 7 9.99357 7 12C7 14.0046 8.48411 14.8962 9.8792 14.1027C10.2392 13.8979 10.6971 14.0238 10.9019 14.3838C11.1067 14.7439 10.9809 15.2018 10.6208 15.4066C8.21539 16.7747 5.5 15.1433 5.5 12ZM13 12C13 8.85442 15.7132 7.22469 18.1216 8.59854C18.4814 8.80378 18.6067 9.26183 18.4015 9.62162C18.1962 9.98141 17.7382 10.1067 17.3784 9.90146C15.9807 9.10417 14.5 9.99357 14.5 12C14.5 14.0046 15.9841 14.8962 17.3792 14.1027C17.7392 13.8979 18.1971 14.0238 18.4019 14.3838C18.6067 14.7439 18.4809 15.2018 18.1208 15.4066C15.7154 16.7747 13 15.1433 13 12Z"
-                                        />
-                                    </svg>
-                                </button>
+                                <div className="flex group relative items-center ml-1">
+                                    <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-[5.5rem] mb-12 group-hover:mb-0 py-2 px-3 text-lg text-white rounded -left-[44px] w-32 text-center bg-[#262626] bg-opacity-[0.9] shadow-md duration-700 pointer-events-none ">
+                                        {isShowSubtitle ? "Subtitles On" : "Subtitles Off"}
+                                    </div>
 
-                                <button className="focus:outline-none active:outline-none rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-2 hover:mt-1 hover:mb-1 active:scale-[0.8] " onClick={() => handleFullscreen()} title="Maximize Minimize">
-                                    {fullScreenIcon && (
-                                        <svg className="h-8 w-8" viewBox="0 0 24 24" title="Expand">
-                                            <path fill="#fff" d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" />
+                                    <button
+                                        className="focus:outline-none active:outline-none rounded aspect-square hover:bg-gray-300 flex justify-center items-center hover:bg-opacity-20 transition-all duration-300 p-1 mx-1 mt-1 hover:mt-0 hover:mb-1 active:scale-75"
+                                        onClick={() => handleSubtitle()}
+                                    >
+                                        <svg className="h-8 w-8" viewBox="0 0 24 24" title="Subtitles">
+                                            {/* <path
+                                                fill="#fff"
+                                                d="M18.75 4C20.5449 4 22 5.45507 22 7.25V16.7546C22 18.5495 20.5449 20.0046 18.75 20.0046H5.25C3.45507 20.0046 2 18.5495 2 16.7546V7.25C2 5.51697 3.35645 4.10075 5.06558 4.00514L5.25 4H18.75ZM18.75 5.5H5.25L5.10647 5.5058C4.20711 5.57881 3.5 6.33183 3.5 7.25V16.7546C3.5 17.7211 4.2835 18.5046 5.25 18.5046H18.75C19.7165 18.5046 20.5 17.7211 20.5 16.7546V7.25C20.5 6.2835 19.7165 5.5 18.75 5.5ZM5.5 12C5.5 8.85442 8.21322 7.22469 10.6216 8.59854C10.9814 8.80378 11.1067 9.26183 10.9015 9.62162C10.6962 9.98141 10.2382 10.1067 9.87838 9.90146C8.48071 9.10417 7 9.99357 7 12C7 14.0046 8.48411 14.8962 9.8792 14.1027C10.2392 13.8979 10.6971 14.0238 10.9019 14.3838C11.1067 14.7439 10.9809 15.2018 10.6208 15.4066C8.21539 16.7747 5.5 15.1433 5.5 12ZM13 12C13 8.85442 15.7132 7.22469 18.1216 8.59854C18.4814 8.80378 18.6067 9.26183 18.4015 9.62162C18.1962 9.98141 17.7382 10.1067 17.3784 9.90146C15.9807 9.10417 14.5 9.99357 14.5 12C14.5 14.0046 15.9841 14.8962 17.3792 14.1027C17.7392 13.8979 18.1971 14.0238 18.4019 14.3838C18.6067 14.7439 18.4809 15.2018 18.1208 15.4066C15.7154 16.7747 13 15.1433 13 12Z"
+                                            /> */}
+                                            {isShowSubtitle ? (
+                                                <path fill="#fff" d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z" />
+                                            ) : (
+                                                <path
+                                                    fill="#fff"
+                                                    d="M18.722 17.289c.841-1.39 1.278-2.942 1.278-4.289v-2h-4v-6h6v5.391c0 2.936-1.176 5.333-3.278 6.898zm-13.993-.011c.836-1.386 1.271-2.934 1.271-4.278v-2h-4v-6h6v5.391c0 2.93-1.184 5.322-3.271 6.887zm-3.729 3.722c5.252-1.039 8.983-4.905 8.983-10.609v-7.391h-9.983v10h4c0 2.211-1.562 4.932-3.995 5.849l.995 2.151zm14 0c5.252-1.039 9-4.905 9-10.609v-7.391h-9.983v10h3.983c0 2.211-1.563 4.932-3.996 5.849l.996 2.151z"
+                                                />
+                                            )}
                                         </svg>
-                                    )}
-                                    {!fullScreenIcon && (
-                                        <svg className="h-8 w-8" viewBox="0 0 24 24" title="Shrink">
-                                            <path fill="#fff" d="M14,14H19V16H16V19H14V14M5,14H10V19H8V16H5V14M8,5H10V10H5V8H8V5M19,8V10H14V5H16V8H19Z" />
-                                        </svg>
-                                    )}
-                                </button>
+                                    </button>
+                                </div>
+
+                                <div className="flex group relative items-center mx-1">
+                                    <div className="absolute whitespace-nowrap group-hover:visible invisible opacity-0 group-hover:opacity-100 transition-all bottom-[5.5rem] mb-12 group-hover:mb-0 py-2 px-3 text-lg text-white rounded -left-[44px] text-center bg-[#262626] bg-opacity-[0.9] shadow-md duration-700 pointer-events-none ">
+                                        {fullScreenIcon ? "Maximize" : "Minimize"}
+                                    </div>
+                                    <button className="focus:outline-none active:outline-none rounded aspect-square hover:bg-gray-300 hover:bg-opacity-20 transition-all duration-300 p-1.5 mx-1 mt-2 hover:mt-1 hover:mb-1 active:scale-[0.8] " onClick={() => handleFullscreen()}>
+                                        {fullScreenIcon ? (
+                                            <svg className="h-7 w-7" viewBox="0 0 24 24" title="Expand">
+                                                <path fill="#fff" d="M24 9h-2v-5h-7v-2h9v7zm-9 13v-2h7v-5h2v7h-9zm-15-7h2v5h7v2h-9v-7zm9-13v2h-7v5h-2v-7h9z" />
+                                            </svg>
+                                        ) : (
+                                            <svg className="h-7 w-7" viewBox="0 0 24 24" title="Shrink">
+                                                <path fill="#fff" d="M15 2h2v5h7v2h-9v-7zm9 13v2h-7v5h-2v-7h9zm-15 7h-2v-5h-7v-2h9v7zm-9-13v-2h7v-5h2v7h-9z" />
+                                            </svg>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
