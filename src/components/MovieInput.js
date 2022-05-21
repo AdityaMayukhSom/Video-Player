@@ -1,4 +1,3 @@
-import "../css/MovieInput.css";
 import FileInput from "./FileInput";
 import TextInput from "./TextInput";
 import { useState } from "react";

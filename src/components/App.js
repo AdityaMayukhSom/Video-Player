@@ -1,7 +1,4 @@
 import React from "react";
-import "../css/App.css";
-import MediaPlayer from "./MediaPlayer";
-
 import MovieInput from "./MovieInput";
 import MovieItem from "./MovieItem";
 import NavBar from "./NavBar";
@@ -42,27 +39,16 @@ function App() {
         },
     ];
 
-    const myWord = true;
-
     return (
-        <div>
-            {!myWord ? (
-                <div className="App">
-                    <MediaPlayer />
-                </div>
-            ) : (
-                <div className="App bg-white dark:bg-[#171717] min-h-screen font-mono">
-                    <NavBar></NavBar>
-                    <div className="h-auto p-4">
-                        <MovieInput></MovieInput>
-
-                        <MovieItem movieName={movieList[0].movieName} movieTime={movieList[0].movieTime} movieShortDetails={movieList[0].movieShortDetails} movieDetails={movieList[0].movieDetails} movieImage={movieList[0].movieImage} movieWatchTime={movieList[0].movieWatchTime}></MovieItem>
-                        <MovieItem movieName={movieList[1].movieName} movieTime={movieList[1].movieTime} movieShortDetails={movieList[1].movieShortDetails} movieDetails={movieList[1].movieDetails} movieImage={movieList[1].movieImage} movieWatchTime={movieList[1].movieWatchTime}></MovieItem>
-                        <MovieItem movieName={movieList[2].movieName} movieTime={movieList[2].movieTime} movieShortDetails={movieList[2].movieShortDetails} movieDetails={movieList[2].movieDetails} movieImage={movieList[2].movieImage} movieWatchTime={movieList[2].movieWatchTime}></MovieItem>
-                        <MovieItem movieName={movieList[3].movieName} movieTime={movieList[3].movieTime} movieShortDetails={movieList[3].movieShortDetails} movieDetails={movieList[3].movieDetails} movieImage={movieList[3].movieImage} movieWatchTime={movieList[3].movieWatchTime}></MovieItem>
-                    </div>
-                </div>
-            )}
+        <div className="App bg-white dark:bg-[#171717] min-h-screen font-mono">
+            <NavBar></NavBar>
+            <div className="h-auto p-4">
+                <MovieInput></MovieInput>
+                <MovieItem movieName={movieList[0].movieName} movieTime={movieList[0].movieTime} movieShortDetails={movieList[0].movieShortDetails} movieDetails={movieList[0].movieDetails} movieImage={movieList[0].movieImage} movieWatchTime={movieList[0].movieWatchTime}></MovieItem>
+                <MovieItem movieName={movieList[1].movieName} movieTime={movieList[1].movieTime} movieShortDetails={movieList[1].movieShortDetails} movieDetails={movieList[1].movieDetails} movieImage={movieList[1].movieImage} movieWatchTime={movieList[1].movieWatchTime}></MovieItem>
+                <MovieItem movieName={movieList[2].movieName} movieTime={movieList[2].movieTime} movieShortDetails={movieList[2].movieShortDetails} movieDetails={movieList[2].movieDetails} movieImage={movieList[2].movieImage} movieWatchTime={movieList[2].movieWatchTime}></MovieItem>
+                <MovieItem movieName={movieList[3].movieName} movieTime={movieList[3].movieTime} movieShortDetails={movieList[3].movieShortDetails} movieDetails={movieList[3].movieDetails} movieImage={movieList[3].movieImage} movieWatchTime={movieList[3].movieWatchTime}></MovieItem>
+            </div>
         </div>
     );
 }

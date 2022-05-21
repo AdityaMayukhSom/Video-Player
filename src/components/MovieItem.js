@@ -1,5 +1,4 @@
 import { useState } from "react";
-import "../css/MovieItem.css";
 import timeConvert from "./TimeConvert";
 
 const MovieItem = (props) => {

@@ -1,13 +1,8 @@
-// A component in react is just a javascript function which returns ome special jsx code
-
-import "../css/HomePage.css";
-import svg1 from "../svg1.svg";
-
-function ExpenseItem() {
+function HomePage() {
     return (
         <div className="container px-6 py-16 items-center lg:flex">
             <div className="flex items-center justify-center w-full  lg:mt-0 lg:w-1/2">
-                <img className="mb-5 max-w-[400px] max-h-full lg:max-w-2xl" src={svg1} alt="Catalogue-pana.svg" />
+                <img className="mb-5 max-w-[400px] max-h-full lg:max-w-2xl" src="./images/TheAmazingSpiderMan2.jpg" alt="Catalogue-pana.svg" />
             </div>
             <div className="w-full lg:w-1/2 lg:max-w-lg">
                 <h1 className="text-2xl font-semibold text-gray-800 uppercase dark:text-white lg:text-3xl">Best Place To Choose Your Clothes</h1>
