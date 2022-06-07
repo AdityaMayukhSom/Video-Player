@@ -766,6 +766,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   max-width: 400px;
 }
 
+.max-w-\[75\%\]{
+  max-width: 75%;
+}
+
 .-translate-y-5{
   --tw-translate-y: -1.25rem;
   -webkit-transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -783,6 +787,10 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .grid-cols-\[2fr_3fr\]{
   grid-template-columns: 2fr 3fr;
+}
+
+.grid-cols-1{
+  grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
 .grid-rows-1{
@@ -1463,6 +1471,10 @@ body::-webkit-scrollbar-thumb {
 }
 
 @media (min-width: 768px){
+  .md\:grid-cols-2{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .md\:flex-row{
     flex-direction: row;
   }
@@ -1501,8 +1513,28 @@ body::-webkit-scrollbar-thumb {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .lg\:grid-cols-3{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .lg\:text-3xl{
     font-size: 1.875rem;
     line-height: 2.25rem;
+  }
+}
+
+@media (min-width: 1280px){
+  .xl\:grid-cols-4{
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .xl\:grid-cols-3{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1536px){
+  .\32xl\:grid-cols-4{
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

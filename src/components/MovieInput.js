@@ -5,8 +5,8 @@ const MovieInput = (props) => {
     }
 
     return (
-        <div className="flex justify-center w-full mb-5 items-center ">
-            <form className="w-full lg:max-w-[75%]" id="nameInputForm" onSubmit={(e) => handleSubmit(e)}>
+        <div className="flex flex-col md:flex-row justify-center w-full mb-5 items-center ">
+            <form className="w-full max-w-[75%]" id="nameInputForm" onSubmit={(e) => handleSubmit(e)}>
                 <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-gray-300">
                     Search
                 </label>

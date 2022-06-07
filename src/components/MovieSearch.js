@@ -106,7 +106,7 @@ function MovieSearch() {
     return (
         <div className="h-auto p-4 mt-5">
             <MovieInput updateMovieName={updateMovieName} getTrending={getTrendingMovieInfo}></MovieInput>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4">{searchResults}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">{searchResults}</div>
         </div>
     );
 }
