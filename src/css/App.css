@@ -17,6 +17,19 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
+body::-webkit-scrollbar {
+    width: 12px; /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+    background: #191919; /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #585858d0; /* color of the scroll thumb */
+    border-radius: 20px; /* roundness of the scroll thumb */
+    border: 3px solid #191919; /* creates padding around scroll thumb */
+}
 .no-scrollbar {
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     scrollbar-width: none; /* Firefox */
