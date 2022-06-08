@@ -47,3 +47,20 @@ body::-webkit-scrollbar-thumb {
     background-clip: padding-box;
     box-shadow: 0px 10px 10px rgba(46, 54, 68, 0.03);
 }
+
+.my-text-shadow {
+    text-shadow: 2px 4px 3px rgba(0, 0, 0, 0.3);
+}
+
+.fade-to-black:before {
+    background-image: linear-gradient(
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 70%,
+        // These three 'smooth' out the fade.
+        rgba(0, 0, 0, 0.2) 80%,
+        rgba(0, 0, 0, 0.7) 90%,
+        rgba(0, 0, 0, 0.9) 95%,
+        // Solid to match the background.
+        rgba(0, 0, 0, 1) 100%
+    );
+}

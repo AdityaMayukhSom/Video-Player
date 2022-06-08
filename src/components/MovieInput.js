@@ -5,7 +5,7 @@ const MovieInput = (props) => {
     }
 
     return (
-        <div className="flex flex-col md:flex-row justify-center w-full mb-5 items-center ">
+        <div className="flex justify-center w-full mb-4 items-center ">
             <form className="w-full max-w-[75%]" id="nameInputForm" onSubmit={(e) => handleSubmit(e)}>
                 <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-gray-300">
                     Search
@@ -30,9 +30,6 @@ const MovieInput = (props) => {
                     </button>
                 </div>
             </form>
-            <button onClick={props.getTrending} className="text-white  bg-[#238636] hover:bg-[#2EA043] focus:outline-none focus:ring-0 font-medium rounded text-sm px-4 h-10 ml-8 whitespace-nowrap">
-                Get Trending
-            </button>
         </div>
     );
 };

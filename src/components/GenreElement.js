@@ -1,35 +1,21 @@
 import React, { useState, useEffect } from "react";
-import MovieInput from "./MovieInput";
 import MovieCard from "./MovieCard";
 
-function MovieSearch() {
+function GenreElement(props) {
     const [searchResults, setSearchResults] = useState();
-    const [movieName, setMovieName] = useState("");
-
-    function updateMovieName(name) {
-        setMovieName(name);
-    }
-
-    useEffect(() => {
-        if (movieName !== "") {
-            searchMovie(movieName);
-        }
-    }, [movieName]);
 
     const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
     const BASE_URL = "https://api.themoviedb.org/3/";
-    const TRENDING_BASE_URL = "".concat("https://api.themoviedb.org/3/trending/movie/day?api_key=", API_KEY);
+    const ACTION_URL = "".concat("https://api.themoviedb.org/3/discover/movie?api_key=", API_KEY, "&with_genres=", props.genreID);
 
-    function searchMovie(name) {
-        let enteredMovieName = name.trim().toLowerCase().replace(/\s/g, "+");
+    function getActionMovies() {
         let requestURL = "".concat(BASE_URL, "configuration?api_key=", API_KEY);
         fetch(requestURL)
             .then((result) => {
                 return result.json();
             })
             .then(() => {
-                let movieSearchURL = "".concat(BASE_URL, "search/movie?api_key=", API_KEY, "&query=", enteredMovieName);
-                fetch(movieSearchURL)
+                fetch(ACTION_URL)
                     .then((result) => {
                         return result.json();
                     })
@@ -37,29 +23,35 @@ function MovieSearch() {
                         setSearchResults(
                             data.results.map((_, index) => {
                                 if (data.results[index].poster_path) {
-                                    console.log(data.results[index].original_title, data.results[index].id);
+                                    // console.log(data.results[index].original_title, data.results[index].id);
                                     return <MovieCard key={data.results[index].id} movieID={data.results[index].id} />;
                                 }
                             })
                         );
                     })
                     .catch((err) => {
-                        console.log("Error Occured");
                         console.log(err);
                     });
             })
             .catch((err) => {
-                console.log("Error Occured");
                 console.log(err);
             });
     }
 
+    useEffect(() => {
+        getActionMovies();
+    }, []);
+
     return (
-        <div className="h-auto p-4 mt-2">
-            <MovieInput updateMovieName={updateMovieName}></MovieInput>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 pt-3 px-6">{searchResults}</div>
+        <div>
+            <div className="px-8 flex text-2xl text-white font-semibold select-none">{props.genreName}</div>
+            <div className="px-6 pt-4 pb-[72px] w-full overflow-x-scroll no-scrollbar ">
+                <div className="grid grid-flow-col ">
+                    {searchResults} <div className="h-full w-6"></div>
+                </div>
+            </div>
         </div>
     );
 }
 
-export default MovieSearch;
+export default GenreElement;
