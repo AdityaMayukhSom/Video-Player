@@ -1,56 +1,45 @@
 import React, { useState, useEffect } from "react";
 import MovieCard from "./MovieCard";
 
+const BASE_URL = "https://api.themoviedb.org/3/";
+const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
+const TRENDING_BASE_URL = "".concat(BASE_URL, "trending/movie/day?api_key=", API_KEY);
+
+async function getTrendingMovie() {
+    try {
+        const res = await fetch(TRENDING_BASE_URL)
+        const data = await res.json()
+        const trendingMoviesResult = data.results
+        return trendingMoviesResult
+    } catch (err) {
+        console.log(err);
+        return []
+    };
+}
 function TrendingMovies() {
-    const [searchResults, setSearchResults] = useState();
-
-    const API_KEY = process.env.REACT_APP_TMDB_API_KEY;
-    const BASE_URL = "https://api.themoviedb.org/3/";
-    const TRENDING_BASE_URL = "".concat("https://api.themoviedb.org/3/trending/movie/day?api_key=", API_KEY);
-
-    function getTrendingMovieInfo() {
-        let requestURL = "".concat(BASE_URL, "configuration?api_key=", API_KEY);
-        fetch(requestURL)
-            .then((result) => {
-                return result.json();
-            })
-            .then(() => {
-                fetch(TRENDING_BASE_URL)
-                    .then((result) => {
-                        return result.json();
-                    })
-                    .then((data) => {
-                        setSearchResults(
-                            data.results.map((_, index) => {
-                                if (data.results[index].poster_path) {
-                                    return <MovieCard key={data.results[index].id} movieID={data.results[index].id} />;
-                                }
-                            })
-                        );
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                    });
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    }
+    const [trendingMovies, setTrendingMovies] = useState([]);
 
     useEffect(() => {
-        getTrendingMovieInfo();
+        (async function () {
+            const trendingMoviesResult = await getTrendingMovie();
+            setTrendingMovies(trendingMoviesResult)
+        })();
     }, []);
 
     return (
-        <div>
-            <div className="px-8 flex text-2xl text-white font-semibold pt-4 select-none">Trending</div>
-            <div className="px-6 pt-4 pb-[72px] w-full overflow-x-scroll no-scrollbar ">
+        <section className='px-4'>
+            <div className="flex pt-4 mx-2 text-2xl font-semibold text-white select-none">Trending</div>
+            <div className="pt-4 pb-[72px] w-full overflow-x-scroll no-scrollbar ">
                 <div className="grid grid-flow-col">
-                    {searchResults}
-                    <div className="h-full w-6"></div>
+                    {trendingMovies.map((trendingMovie) => {
+                        return (trendingMovie.poster_path) ?
+                            <MovieCard key={trendingMovie.id} movieID={trendingMovie.id} /> :
+                            <></>
+                    })}
                 </div>
+                <div className="w-6 h-full" ></div>
             </div>
-        </div>
+        </section>
     );
 }
 

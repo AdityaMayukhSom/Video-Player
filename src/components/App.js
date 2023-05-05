@@ -1,25 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
+
 import NavBar from "./NavBar";
 import Footer from "./Footer";
 import HomePage from "./HomePage";
-import TrendingMovies from "./TrendingMovies";
 import GenreElement from "./GenreElement";
+import TrendingMovies from "./TrendingMovies";
+import MovieDetailedCard from "./MovieDetailedCard";
+import { DetailedMovieContext } from './context/DetailedMovieContext';
 // import MovieSearch from "./MovieSearch";
+
+const genreNameIdList = [
+    { id: 28, name: 'Action' },
+    { id: 878, name: 'Science Fiction' },
+    { id: 35, name: 'Comedy' },
+    { id: 10749, name: 'Romance' },
+    { id: 80, name: 'Crime' },
+    { id: 16, name: 'Animation' },
+    { id: 10752, name: 'War' }
+]
+
+
 function App() {
+    const [movieIdIsShow, setMovieIdIsShow] = useState({ movieId: -1, isShow: false })
     return (
-        <div className="App bg-white dark:bg-[#171717] min-h-screen h-fit">
-            <NavBar />
-            <HomePage />
-            <TrendingMovies />
-            <GenreElement genreName={"Action"} genreID={28} />
-            <GenreElement genreName={"Sci-Fi"} genreID={878} />
-            <GenreElement genreName={"Comedy"} genreID={35} />
-            <GenreElement genreName={"Romance"} genreID={10749} />
-            <GenreElement genreName={"Crime"} genreID={80} />
-            <GenreElement genreName={"Animation"} genreID={16} />
-            <Footer />
-            {/* <MovieSearch /> */}
-        </div>
+        <DetailedMovieContext.Provider value={[movieIdIsShow, setMovieIdIsShow]}>
+            <div className="App bg-white dark:bg-[#171717] min-h-screen h-fit">
+                <NavBar />
+                <HomePage />
+                <TrendingMovies />
+                {genreNameIdList.map((genre) => {
+                    return <GenreElement
+                        key={genre.id}
+                        genreID={genre.id}
+                        genreName={genre.name} />
+                })}
+                <MovieDetailedCard />
+                <Footer />
+                {/* <MovieSearch /> */}
+            </div>
+        </DetailedMovieContext.Provider>
     );
 }
 

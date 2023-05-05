@@ -60,20 +60,16 @@ const Footer = () => {
                             <p className="font-medium">Company</p>
                             <nav className="flex flex-col mt-4 space-y-2 text-sm text-gray-300">
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    About{" "}
+                                    About
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Meet the Team{" "}
+                                    Meet the Team
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    History{" "}
+                                    History
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Careers{" "}
+                                    Careers
                                 </a>
                             </nav>
                         </div>
@@ -81,24 +77,19 @@ const Footer = () => {
                             <p className="font-medium">Services</p>
                             <nav className="flex flex-col mt-4 space-y-2 text-sm text-gray-300">
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    1on1 Coaching{" "}
+                                    1on1 Coaching
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Company Review{" "}
+                                    Company Review
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Accounts Review{" "}
+                                    Accounts Review
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    HR Consulting{" "}
+                                    HR Consulting
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    SEO Optimisation{" "}
+                                    SEO Optimisation
                                 </a>
                             </nav>
                         </div>
@@ -106,16 +97,13 @@ const Footer = () => {
                             <p className="font-medium">Helpful Links</p>
                             <nav className="flex flex-col mt-4 space-y-2 text-sm text-gray-300">
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Contact{" "}
+                                    Contact
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    FAQs{" "}
+                                    FAQs
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Live Chat{" "}
+                                    Live Chat
                                 </a>
                             </nav>
                         </div>
@@ -123,31 +111,27 @@ const Footer = () => {
                             <p className="font-medium">Legal</p>
                             <nav className="flex flex-col mt-4 space-y-2 text-sm text-gray-300">
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Privacy Policy{" "}
+                                    Privacy Policy
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Terms &amp; Conditions{" "}
+                                    Terms &amp; Conditions
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Returns Policy{" "}
+                                    Returns Policy
                                 </a>
                                 <a className="hover:opacity-75" href="#_">
-                                    {" "}
-                                    Accessibility{" "}
+                                    Accessibility
                                 </a>
                             </nav>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col md:flex-row w-full justify-between pb-4 px-8 mt-8 md:mt-0 text-sm font-medium">
+            <div className="flex flex-col md:flex-row w-full justify-between pb-5 px-8 pt-5 text-sm font-medium border-t border-gray-800">
                 <div className="">
-                    Created With ❤️ By{" "}
-                    <a className=" text-yellow-500" href="https://www.github.com/AdityaMayukhSom">
-                        Aditya Mayukh Som
+                    Developed With ❤️ By
+                    <a href="https://www.github.com/AdityaMayukhSom" className="ml-1">
+                        Aditya Mayukh Som.
                     </a>
                 </div>
                 <div id="copyright">
